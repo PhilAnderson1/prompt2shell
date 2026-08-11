@@ -192,11 +192,11 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer) error {
 
 func main() {
 	if err := run(os.Args[1:], os.Stdin, os.Stdout, os.Stderr); err != nil {
-		fmt.Fprintln(os.Stderr, "s:", err)
 		var exitError *exec.ExitError
 		if errors.As(err, &exitError) {
 			os.Exit(exitError.ExitCode())
 		}
+		fmt.Fprintln(os.Stderr, "s:", err)
 		os.Exit(1)
 	}
 }
