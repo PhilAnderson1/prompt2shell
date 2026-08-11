@@ -6,6 +6,17 @@ runs it only after you press Enter. Press Esc to abort.
 The program is written in Go so it builds as a single native executable with no
 runtime, package manager, or virtual environment required on the target machine.
 
+## Configure the AI endpoint
+
+Before building, edit the configuration constants near the top of `main.go`:
+
+- `endpoint`: the full URL of an OpenAI-compatible chat-completions endpoint
+- `model`: the model name expected by that endpoint
+- `apiToken`: the endpoint access token
+
+The endpoint must be reachable from every machine where `s` will run. Do not
+commit a real access token to a public repository.
+
 ## Build and install
 
 ```sh

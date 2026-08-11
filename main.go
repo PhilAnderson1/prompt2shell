@@ -15,6 +15,7 @@ import (
 	"unsafe"
 )
 
+// Configure these values for your OpenAI-compatible API endpoint before building.
 const (
 	endpoint = "https://yourendpoint.host:8081/v1/chat/completions"
 	model    = "Qwen3.6-35B-A3B"
