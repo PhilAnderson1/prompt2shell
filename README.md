@@ -47,5 +47,5 @@ running them, especially commands that modify or delete files.
 
 This project was inspired by
 [whatisit-nl2sh](https://github.com/ThorOdinson246/whatisit-nl2sh), created by
-[ThorOdinson246](https://github.com/ThorOdinson246). It provides similar
+[ThorOdinson246](https://github.com/ThorOdinson246), which provides similar
 functionality locally without requiring an external AI endpoint.
