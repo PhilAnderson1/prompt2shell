@@ -28,8 +28,8 @@ type chatRequest struct {
 	Temperature        float64           `json:"temperature"`
 	MaxTokens          int               `json:"max_tokens"`
 	ResponseFormat     map[string]string `json:"response_format"`
-	ChatTemplateKwargs map[string]bool   `json:"chat_template_kwargs"`
-	Reasoning          map[string]string `json:"reasoning"`
+	ChatTemplateKwargs map[string]bool   `json:"chat_template_kwargs,omitempty"`
+	Reasoning          map[string]string `json:"reasoning,omitempty"`
 }
 
 type message struct {
@@ -47,19 +47,28 @@ type commandResponse struct {
 	Command string `json:"command"`
 }
 
-func generateCommand(config Config, instruction string) (string, error) {
+func buildChatRequest(config Config, instruction string) chatRequest {
 	payload := chatRequest{
 		Model: config.Model,
 		Messages: []message{
 			{Role: "system", Content: systemPrompt},
 			{Role: "user", Content: instruction},
 		},
-		Temperature:        0.1,
-		MaxTokens:          300,
-		ResponseFormat:     map[string]string{"type": "json_object"},
-		ChatTemplateKwargs: map[string]bool{"enable_thinking": config.Reasoning != "none"},
-		Reasoning:          map[string]string{"effort": config.Reasoning},
+		Temperature:    0.1,
+		MaxTokens:      300,
+		ResponseFormat: map[string]string{"type": "json_object"},
 	}
+	switch config.APIType {
+	case "openrouter":
+		payload.Reasoning = map[string]string{"effort": "none"}
+	case "llamacpp":
+		payload.ChatTemplateKwargs = map[string]bool{"enable_thinking": false}
+	}
+	return payload
+}
+
+func generateCommand(config Config, instruction string) (string, error) {
+	payload := buildChatRequest(config, instruction)
 	body, err := json.Marshal(payload)
 	if err != nil {
 		return "", err

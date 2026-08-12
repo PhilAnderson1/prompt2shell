@@ -17,12 +17,13 @@ precedence when both exist.
 endpoint=https://example.com/v1/chat/completions
 model=your-model-name
 api_token=your-api-token
-reasoning=none
+api_type=generic
 ```
 
 `endpoint` and `model` are required. `api_token` may be left empty when the
-endpoint does not require authentication. `reasoning` accepts `none`, `minimal`,
-`low`, `medium`, or `high`, and defaults to `none`. The endpoint must be reachable
+endpoint does not require authentication. Set `api_type` to `openrouter`,
+`llamacpp`, or `generic`; it defaults to `generic`. This lets `s` disable model
+reasoning using only the parameter supported by that API. The endpoint must be reachable
 from every machine where `s` will run. Protect a per-user file with:
 
 ```sh

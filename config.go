@@ -12,10 +12,10 @@ import (
 )
 
 type Config struct {
-	Endpoint  string
-	Model     string
-	APIToken  string
-	Reasoning string
+	Endpoint string
+	Model    string
+	APIToken string
+	APIType  string
 }
 
 func loadConfig() (Config, error) {
@@ -52,7 +52,7 @@ func loadConfigFrom(paths []string) (Config, error) {
 }
 
 func parseConfig(reader io.Reader) (Config, error) {
-	config := Config{Reasoning: "none"}
+	config := Config{APIType: "generic"}
 	seen := make(map[string]bool)
 	scanner := bufio.NewScanner(reader)
 	for lineNumber := 1; scanner.Scan(); lineNumber++ {
@@ -76,8 +76,8 @@ func parseConfig(reader io.Reader) (Config, error) {
 			config.Model = value
 		case "api_token":
 			config.APIToken = value
-		case "reasoning":
-			config.Reasoning = value
+		case "api_type":
+			config.APIType = value
 		default:
 			return Config{}, fmt.Errorf("line %d: unknown key %q", lineNumber, key)
 		}
@@ -88,12 +88,11 @@ func parseConfig(reader io.Reader) (Config, error) {
 	if config.Endpoint == "" || config.Model == "" {
 		return Config{}, errors.New("endpoint and model are required")
 	}
-	validReasoning := map[string]bool{
-		"none": true, "minimal": true, "low": true,
-		"medium": true, "high": true,
+	validAPITypes := map[string]bool{
+		"generic": true, "openrouter": true, "llamacpp": true,
 	}
-	if !validReasoning[config.Reasoning] {
-		return Config{}, errors.New("reasoning must be one of: none, minimal, low, medium, high")
+	if !validAPITypes[config.APIType] {
+		return Config{}, errors.New("api_type must be one of: generic, openrouter, llamacpp")
 	}
 	parsedURL, err := url.Parse(config.Endpoint)
 	if err != nil || parsedURL.Host == "" || (parsedURL.Scheme != "https" && parsedURL.Scheme != "http") {

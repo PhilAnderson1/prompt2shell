@@ -8,11 +8,11 @@ import (
 )
 
 func TestParseConfig(t *testing.T) {
-	config, err := parseConfig(strings.NewReader("# comment\nendpoint=https://example.com/v1/chat/completions\nmodel=test-model\napi_token=secret\nreasoning=low\n"))
+	config, err := parseConfig(strings.NewReader("# comment\nendpoint=https://example.com/v1/chat/completions\nmodel=test-model\napi_token=secret\napi_type=openrouter\n"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	if config.Endpoint != "https://example.com/v1/chat/completions" || config.Model != "test-model" || config.APIToken != "secret" || config.Reasoning != "low" {
+	if config.Endpoint != "https://example.com/v1/chat/completions" || config.Model != "test-model" || config.APIToken != "secret" || config.APIType != "openrouter" {
 		t.Fatalf("unexpected config: %#v", config)
 	}
 }
@@ -23,7 +23,7 @@ func TestParseConfigRejectsInvalidInput(t *testing.T) {
 		"endpoint=ftp://example.com\nmodel=test\n",
 		"endpoint=https://example.com\nmodel=test\nunknown=value\n",
 		"endpoint=https://one.example\nendpoint=https://two.example\nmodel=test\n",
-		"endpoint=https://example.com\nmodel=test\nreasoning=extreme\n",
+		"endpoint=https://example.com\nmodel=test\napi_type=unknown\n",
 	}
 	for _, input := range tests {
 		if _, err := parseConfig(strings.NewReader(input)); err == nil {
@@ -32,13 +32,13 @@ func TestParseConfigRejectsInvalidInput(t *testing.T) {
 	}
 }
 
-func TestParseConfigDefaultsReasoningToNone(t *testing.T) {
+func TestParseConfigDefaultsAPITypeToGeneric(t *testing.T) {
 	config, err := parseConfig(strings.NewReader("endpoint=https://example.com\nmodel=test\n"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	if config.Reasoning != "none" {
-		t.Fatalf("got reasoning %q, want none", config.Reasoning)
+	if config.APIType != "generic" {
+		t.Fatalf("got API type %q, want generic", config.APIType)
 	}
 }
 
