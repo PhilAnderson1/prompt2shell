@@ -8,14 +8,26 @@ runtime, package manager, or virtual environment required on the target machine.
 
 ## Configure the AI endpoint
 
-Before building, edit the configuration constants near the top of `main.go`:
+Create `~/.config/prompt2shell.conf` for a per-user configuration, or
+`/etc/prompt2shell.conf` for a system-wide configuration. The per-user file takes
+precedence when both exist.
 
-- `endpoint`: the full URL of an OpenAI-compatible chat-completions endpoint
-- `model`: the model name expected by that endpoint
-- `apiToken`: the endpoint access token
+```ini
+# OpenAI-compatible chat-completions endpoint
+endpoint=https://example.com/v1/chat/completions
+model=your-model-name
+api_token=your-api-token
+```
 
-The endpoint must be reachable from every machine where `s` will run. Do not
-commit a real access token to a public repository.
+`endpoint` and `model` are required. `api_token` may be left empty when the
+endpoint does not require authentication. The endpoint must be reachable from
+every machine where `s` will run. Protect a per-user file with:
+
+```sh
+chmod 600 ~/.config/prompt2shell.conf
+```
+
+Do not commit a real access token to a public repository.
 
 ## Build and install
 
@@ -39,9 +51,8 @@ find . -type f -size +100M
 Press Enter to run, or Esc to abort:
 ```
 
-The AI endpoint and model are compiled into the binary. The endpoint must be
-reachable from the machine running `s`. Always inspect generated commands before
-running them, especially commands that modify or delete files.
+Always inspect generated commands before running them, especially commands that
+modify or delete files.
 
 ## Inspiration
 

@@ -15,13 +15,6 @@ import (
 	"unsafe"
 )
 
-// Configure these values for your OpenAI-compatible API endpoint before building.
-const (
-	endpoint = "https://yourendpoint.host/v1/chat/completions"
-	model    = "Qwen3.6-35B-A3B"
-	apiToken = "your-api-token-goes-here"
-)
-
 const systemPrompt = `Convert the user's natural-language request into one Linux shell command.
 Return JSON with exactly one string field named "command".
 The command must work from the user's current directory unless they ask otherwise.
@@ -53,9 +46,9 @@ type commandResponse struct {
 	Command string `json:"command"`
 }
 
-func generateCommand(instruction string) (string, error) {
+func generateCommand(config Config, instruction string) (string, error) {
 	payload := chatRequest{
-		Model: model,
+		Model: config.Model,
 		Messages: []message{
 			{Role: "system", Content: systemPrompt},
 			{Role: "user", Content: instruction},
@@ -71,12 +64,14 @@ func generateCommand(instruction string) (string, error) {
 	}
 
 	client := &http.Client{Timeout: 5 * time.Minute}
-	request, err := http.NewRequest(http.MethodPost, endpoint, bytes.NewReader(body))
+	request, err := http.NewRequest(http.MethodPost, config.Endpoint, bytes.NewReader(body))
 	if err != nil {
 		return "", err
 	}
 	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Authorization", "Bearer "+apiToken)
+	if config.APIToken != "" {
+		request.Header.Set("Authorization", "Bearer "+config.APIToken)
+	}
 
 	response, err := client.Do(request)
 	if err != nil {
@@ -158,7 +153,11 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer) error {
 		return errors.New("usage: s <describe the command you want>")
 	}
 
-	command, err := generateCommand(strings.Join(args, " "))
+	config, err := loadConfig()
+	if err != nil {
+		return err
+	}
+	command, err := generateCommand(config, strings.Join(args, " "))
 	if err != nil {
 		return err
 	}
