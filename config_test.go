@@ -8,11 +8,11 @@ import (
 )
 
 func TestParseConfig(t *testing.T) {
-	config, err := parseConfig(strings.NewReader("# comment\nendpoint=https://example.com/v1/chat/completions\nmodel=test-model\napi_token=secret\n"))
+	config, err := parseConfig(strings.NewReader("# comment\nendpoint=https://example.com/v1/chat/completions\nmodel=test-model\napi_token=secret\nreasoning=low\n"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	if config.Endpoint != "https://example.com/v1/chat/completions" || config.Model != "test-model" || config.APIToken != "secret" {
+	if config.Endpoint != "https://example.com/v1/chat/completions" || config.Model != "test-model" || config.APIToken != "secret" || config.Reasoning != "low" {
 		t.Fatalf("unexpected config: %#v", config)
 	}
 }
@@ -23,11 +23,22 @@ func TestParseConfigRejectsInvalidInput(t *testing.T) {
 		"endpoint=ftp://example.com\nmodel=test\n",
 		"endpoint=https://example.com\nmodel=test\nunknown=value\n",
 		"endpoint=https://one.example\nendpoint=https://two.example\nmodel=test\n",
+		"endpoint=https://example.com\nmodel=test\nreasoning=extreme\n",
 	}
 	for _, input := range tests {
 		if _, err := parseConfig(strings.NewReader(input)); err == nil {
 			t.Errorf("expected error for %q", input)
 		}
+	}
+}
+
+func TestParseConfigDefaultsReasoningToNone(t *testing.T) {
+	config, err := parseConfig(strings.NewReader("endpoint=https://example.com\nmodel=test\n"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if config.Reasoning != "none" {
+		t.Fatalf("got reasoning %q, want none", config.Reasoning)
 	}
 }
 

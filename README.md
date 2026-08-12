@@ -17,11 +17,13 @@ precedence when both exist.
 endpoint=https://example.com/v1/chat/completions
 model=your-model-name
 api_token=your-api-token
+reasoning=none
 ```
 
 `endpoint` and `model` are required. `api_token` may be left empty when the
-endpoint does not require authentication. The endpoint must be reachable from
-every machine where `s` will run. Protect a per-user file with:
+endpoint does not require authentication. `reasoning` accepts `none`, `minimal`,
+`low`, `medium`, or `high`, and defaults to `none`. The endpoint must be reachable
+from every machine where `s` will run. Protect a per-user file with:
 
 ```sh
 chmod 600 ~/.config/prompt2shell.conf

@@ -12,9 +12,10 @@ import (
 )
 
 type Config struct {
-	Endpoint string
-	Model    string
-	APIToken string
+	Endpoint  string
+	Model     string
+	APIToken  string
+	Reasoning string
 }
 
 func loadConfig() (Config, error) {
@@ -51,7 +52,7 @@ func loadConfigFrom(paths []string) (Config, error) {
 }
 
 func parseConfig(reader io.Reader) (Config, error) {
-	var config Config
+	config := Config{Reasoning: "none"}
 	seen := make(map[string]bool)
 	scanner := bufio.NewScanner(reader)
 	for lineNumber := 1; scanner.Scan(); lineNumber++ {
@@ -75,6 +76,8 @@ func parseConfig(reader io.Reader) (Config, error) {
 			config.Model = value
 		case "api_token":
 			config.APIToken = value
+		case "reasoning":
+			config.Reasoning = value
 		default:
 			return Config{}, fmt.Errorf("line %d: unknown key %q", lineNumber, key)
 		}
@@ -84,6 +87,13 @@ func parseConfig(reader io.Reader) (Config, error) {
 	}
 	if config.Endpoint == "" || config.Model == "" {
 		return Config{}, errors.New("endpoint and model are required")
+	}
+	validReasoning := map[string]bool{
+		"none": true, "minimal": true, "low": true,
+		"medium": true, "high": true,
+	}
+	if !validReasoning[config.Reasoning] {
+		return Config{}, errors.New("reasoning must be one of: none, minimal, low, medium, high")
 	}
 	parsedURL, err := url.Parse(config.Endpoint)
 	if err != nil || parsedURL.Host == "" || (parsedURL.Scheme != "https" && parsedURL.Scheme != "http") {

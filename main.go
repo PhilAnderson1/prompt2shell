@@ -29,6 +29,7 @@ type chatRequest struct {
 	MaxTokens          int               `json:"max_tokens"`
 	ResponseFormat     map[string]string `json:"response_format"`
 	ChatTemplateKwargs map[string]bool   `json:"chat_template_kwargs"`
+	Reasoning          map[string]string `json:"reasoning"`
 }
 
 type message struct {
@@ -56,7 +57,8 @@ func generateCommand(config Config, instruction string) (string, error) {
 		Temperature:        0.1,
 		MaxTokens:          300,
 		ResponseFormat:     map[string]string{"type": "json_object"},
-		ChatTemplateKwargs: map[string]bool{"enable_thinking": false},
+		ChatTemplateKwargs: map[string]bool{"enable_thinking": config.Reasoning != "none"},
+		Reasoning:          map[string]string{"effort": config.Reasoning},
 	}
 	body, err := json.Marshal(payload)
 	if err != nil {
