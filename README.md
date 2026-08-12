@@ -13,11 +13,11 @@ Create `~/.config/prompt2shell.conf` for a per-user configuration, or
 precedence when both exist.
 
 ```ini
-# OpenAI-compatible chat-completions endpoint
-endpoint=https://example.com/v1/chat/completions
-model=your-model-name
-api_token=your-api-token
-api_type=generic
+# OpenRouter example
+endpoint=https://openrouter.ai/api/v1/chat/completions
+model=qwen/qwen3.6-35b-a3b
+api_token=your-openrouter-api-key
+api_type=openrouter
 ```
 
 `endpoint` and `model` are required. `api_token` may be left empty when the
