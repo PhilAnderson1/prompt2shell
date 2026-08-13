@@ -115,10 +115,3 @@ For a quick local Linux build and per-user installation:
 CGO_ENABLED=0 go build -o p2s .
 install -m 0755 p2s "$HOME/.local/bin/p2s"
 ```
-
-## Inspiration
-
-This project was inspired by
-[whatisit-nl2sh](https://github.com/ThorOdinson246/whatisit-nl2sh), created by
-[ThorOdinson246](https://github.com/ThorOdinson246), which provides similar
-functionality locally without requiring an external AI endpoint.
