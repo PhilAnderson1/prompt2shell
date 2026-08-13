@@ -7,6 +7,19 @@ Esc to abort.
 The program is written in Go so it builds as a single native executable with no
 runtime, package manager, or virtual environment required on the target machine.
 
+## Use
+
+```text
+$ p2s find files bigger than 100mb in the current directory
+find . -type f -size +100M
+Press Enter to run, or Esc to abort:
+```
+
+On Windows, use `p2s` in PowerShell; generated commands use PowerShell syntax.
+
+Always inspect generated commands before running them, especially commands that
+modify or delete files.
+
 ## Configure the AI endpoint
 
 Configuration paths, in lookup order:
@@ -42,14 +55,9 @@ api_type=openai
 reasoning_effort=minimal
 ```
 
-Allowed configuration values are `none`, `minimal`, `low`, `medium`, `high`, `xhigh`, and `max`, but each model supports only a subset. When omitted, the API uses the model default. The endpoint must be
-reachable from every machine where `p2s` will run. Protect a per-user file with:
+Allowed OpenAI configuration values are `none`, `minimal`, `low`, `medium`, `high`, `xhigh`, and `max`, but each model supports only a subset. When omitted, the API uses the model default. The endpoint must be
+reachable from every machine where `p2s` will run.
 
-```sh
-chmod 600 ~/.config/prompt2shell.conf
-```
-
-Do not commit a real access token to a public repository.
 
 After installation, edit `prompt2shell.conf` and add your API key. You can also
 replace the supplied OpenRouter endpoint and model with another supported AI
@@ -98,20 +106,6 @@ For a quick local Linux build and per-user installation:
 CGO_ENABLED=0 go build -o p2s .
 install -m 0755 p2s "$HOME/.local/bin/p2s"
 ```
-
-## Use
-
-```text
-$ p2s find files bigger than 100mb in the current directory
-find . -type f -size +100M
-Press Enter to run, or Esc to abort:
-```
-
-On Windows, use `p2s` in PowerShell; generated commands
-use PowerShell syntax.
-
-Always inspect generated commands before running them, especially commands that
-modify or delete files.
 
 ## Inspiration
 
