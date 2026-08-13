@@ -31,6 +31,20 @@ On Windows, use `p2s` in PowerShell; generated commands use PowerShell syntax.
 Always inspect generated commands before running them, especially commands that
 modify or delete files.
 
+## Build and install
+
+Download the archive for your operating system from the GitHub Releases page.
+Each archive contains binaries for all supported architectures and an installer
+that selects the correct one automatically. See [INSTALL.md](INSTALL.md) for
+complete installation and build instructions.
+
+For a quick local Linux build and per-user installation:
+
+```sh
+CGO_ENABLED=0 go build -o p2s .
+install -m 0755 p2s "$HOME/.local/bin/p2s"
+```
+
 ## Configure the AI endpoint
 
 Configuration paths, in lookup order:
@@ -105,18 +119,4 @@ api_type=llamacpp
 # OpenAI
 endpoint=https://api.openai.com/v1/responses
 api_type=openai
-```
-
-## Build and install
-
-Download the archive for your operating system from the GitHub Releases page.
-Each archive contains binaries for all supported architectures and an installer
-that selects the correct one automatically. See [INSTALL.md](INSTALL.md) for
-complete installation and build instructions.
-
-For a quick local Linux build and per-user installation:
-
-```sh
-CGO_ENABLED=0 go build -o p2s .
-install -m 0755 p2s "$HOME/.local/bin/p2s"
 ```
