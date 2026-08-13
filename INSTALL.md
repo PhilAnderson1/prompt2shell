@@ -5,11 +5,12 @@ before choosing an endpoint and `api_type`.
 
 ## Linux release package
 
-Download `prompt2shell-v1.0.0-linux.tar.gz` from the GitHub release, then run:
+Download the Linux `.tar.gz` package from the GitHub release, then run the
+following commands, replacing `<version>` with the downloaded version number:
 
 ```sh
-tar -xzf prompt2shell-v1.0.0-linux.tar.gz
-cd prompt2shell-v1.0.0-linux
+tar -xzf prompt2shell-<version>-linux.tar.gz
+cd prompt2shell-<version>-linux
 sudo ./install-linux.sh
 ```
 
@@ -36,8 +37,8 @@ appropriate.
 
 ## Windows release package
 
-Download and extract `prompt2shell-v1.0.0-windows.zip`. Open PowerShell as an
-administrator, change to the extracted folder, and run:
+Download and extract the Windows `.zip` package from the GitHub release. Open
+PowerShell as an administrator, change to the extracted folder, and run:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\install-windows.ps1
