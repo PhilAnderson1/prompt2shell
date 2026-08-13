@@ -80,12 +80,12 @@ Linux with:
 CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o p2s.exe .
 ```
 
-Place `p2s.exe` in a directory on your Windows `PATH`. Create the user
-configuration directory and copy the example from PowerShell:
+Put `install-windows.ps1`, `prompt2shell.conf`, and
+`p2s-windows-amd64.exe` together in a folder on the Windows machine. Open
+PowerShell as an administrator, change to that folder, and run:
 
 ```powershell
-New-Item -ItemType Directory -Force "$env:APPDATA\prompt2shell"
-Copy-Item .\prompt2shell.conf "$env:APPDATA\prompt2shell\prompt2shell.conf"
+powershell -ExecutionPolicy Bypass -File .\install-windows.ps1
 ```
 
 ## Use
