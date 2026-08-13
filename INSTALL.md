@@ -1,5 +1,8 @@
 # Installing prompt2shell
 
+See the [tested API configurations](README.md#tested-api-configurations) before
+choosing an endpoint and `api_type`.
+
 ## Linux release package
 
 Download `prompt2shell-v1.0.0-linux.tar.gz` from the GitHub release, then run:

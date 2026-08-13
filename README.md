@@ -59,6 +59,32 @@ endpoint. The system-wide configuration is installed at:
 - Windows: `%ProgramData%\prompt2shell\prompt2shell.conf` (normally
   `C:\ProgramData\prompt2shell\prompt2shell.conf`)
 
+### Tested API configurations
+
+These are the API combinations tested with prompt2shell; this is not an
+exhaustive compatibility list.
+
+| `api_type` | Service | Tested endpoint type |
+| --- | --- | --- |
+| `openrouter` | OpenRouter | Chat Completions |
+| `llamacpp` | llama.cpp | Chat Completions |
+| `openai` | OpenAI | Responses |
+| `generic` | Other OpenAI-compatible services | Chat Completions; compatibility varies |
+
+```ini
+# OpenRouter
+endpoint=https://openrouter.ai/api/v1/chat/completions
+api_type=openrouter
+
+# llama.cpp
+endpoint=https://example.com/v1/chat/completions
+api_type=llamacpp
+
+# OpenAI
+endpoint=https://api.openai.com/v1/responses
+api_type=openai
+```
+
 ## Build and install
 
 Download the archive for your operating system from the GitHub Releases page.
