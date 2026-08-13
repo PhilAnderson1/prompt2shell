@@ -81,7 +81,7 @@ CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o p2s.exe .
 ```
 
 Put `install-windows.ps1`, `prompt2shell.conf`, and
-`p2s-windows-amd64.exe` together in a folder on the Windows machine. Open
+`p2s.exe` together in a folder on the Windows machine. Open
 PowerShell as an administrator, change to that folder, and run:
 
 ```powershell

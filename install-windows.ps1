@@ -9,7 +9,7 @@ if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administra
 }
 
 $sourceDirectory = $PSScriptRoot
-$binarySource = Join-Path $sourceDirectory "p2s-windows-amd64.exe"
+$binarySource = Join-Path $sourceDirectory "p2s.exe"
 $configSource = Join-Path $sourceDirectory "prompt2shell.conf"
 $installDirectory = Join-Path $env:ProgramFiles "prompt2shell"
 $binaryDestination = Join-Path $installDirectory "p2s.exe"
@@ -17,7 +17,7 @@ $configDirectory = Join-Path $env:ProgramData "prompt2shell"
 $configDestination = Join-Path $configDirectory "prompt2shell.conf"
 
 if (-not (Test-Path -LiteralPath $binarySource -PathType Leaf)) {
-    Write-Error "Missing $binarySource. Place the installer beside p2s-windows-amd64.exe."
+    Write-Error "Missing $binarySource. Place the installer beside p2s.exe."
     exit 1
 }
 
