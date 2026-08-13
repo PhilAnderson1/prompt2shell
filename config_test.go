@@ -61,3 +61,11 @@ func TestLoadConfigUsesFirstExistingFile(t *testing.T) {
 		t.Fatalf("got model %q, want user-model", config.Model)
 	}
 }
+
+func TestConfigPathBesideExecutable(t *testing.T) {
+	want := filepath.Join("somewhere", "bin", "prompt2shell.conf")
+	got := configPathBesideExecutable(filepath.Join("somewhere", "bin", "p2s"))
+	if got != want {
+		t.Fatalf("got %q, want %q", got, want)
+	}
+}

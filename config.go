@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/url"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -24,6 +25,18 @@ func loadConfig() (Config, error) {
 		return Config{}, err
 	}
 	return loadConfigFrom(paths)
+}
+
+func executableConfigPath() (string, error) {
+	executable, err := os.Executable()
+	if err != nil {
+		return "", fmt.Errorf("find executable path: %w", err)
+	}
+	return configPathBesideExecutable(executable), nil
+}
+
+func configPathBesideExecutable(executable string) string {
+	return filepath.Join(filepath.Dir(executable), "prompt2shell.conf")
 }
 
 func loadConfigFrom(paths []string) (Config, error) {
@@ -45,7 +58,7 @@ func loadConfigFrom(paths []string) (Config, error) {
 		}
 		return config, nil
 	}
-	return Config{}, fmt.Errorf("configuration not found; create %s or %s", paths[0], paths[1])
+	return Config{}, fmt.Errorf("configuration not found; checked %s", strings.Join(paths, ", "))
 }
 
 func parseConfig(reader io.Reader) (Config, error) {

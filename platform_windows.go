@@ -23,6 +23,10 @@ Return only the command itself in the field: no Markdown, explanation, prompt pr
 If the request is ambiguous, choose the safest non-destructive interpretation.`
 
 func configPaths() ([]string, error) {
+	portableConfig, err := executableConfigPath()
+	if err != nil {
+		return nil, err
+	}
 	appData := os.Getenv("APPDATA")
 	if appData == "" {
 		return nil, errors.New("APPDATA is not set")
@@ -32,6 +36,7 @@ func configPaths() ([]string, error) {
 		programData = `C:\ProgramData`
 	}
 	return []string{
+		portableConfig,
 		filepath.Join(appData, "prompt2shell", "prompt2shell.conf"),
 		filepath.Join(programData, "prompt2shell", "prompt2shell.conf"),
 	}, nil

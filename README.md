@@ -15,6 +15,8 @@ command for approval before it runs. Press Enter to execute it or Esc to abort.
   replacement shell or terminal application to install.
 - **Cross-platform:** supports Linux and Windows, with binaries for x86-64 and
   Arm processors.
+- **Flexible installation:** install it per user or system-wide, or run it
+  directly from a USB drive.
 
 ## Use
 
@@ -33,11 +35,14 @@ modify or delete files.
 
 Configuration paths, in lookup order:
 
-- Linux: `~/.config/prompt2shell.conf`, then `/etc/prompt2shell.conf`
-- Windows: `%APPDATA%\prompt2shell\prompt2shell.conf`, then
+- Linux: `prompt2shell.conf` in the same directory as the executable, then
+  `~/.config/prompt2shell.conf`, then `/etc/prompt2shell.conf`
+- Windows: `prompt2shell.conf` in the same directory as the executable, then
+  `%APPDATA%\prompt2shell\prompt2shell.conf`, then
   `%ProgramData%\prompt2shell\prompt2shell.conf`
 
-The per-user file takes precedence when both exist.
+This allows `p2s` and its configuration to run directly from portable media
+such as a USB drive. The first configuration found takes precedence.
 
 ```ini
 # OpenRouter example

@@ -3,6 +3,12 @@
 See the [tested API configurations](https://github.com/PhilAnderson1/prompt2shell#tested-api-configurations)
 before choosing an endpoint and `api_type`.
 
+For portable use without installation, copy the appropriate `p2s` executable
+and `prompt2shell.conf` to the same directory on a USB drive. Run the executable
+directly from the drive. A configuration in the same directory as the
+executable takes precedence over per-user and system-wide configuration files
+on both Linux and Windows.
+
 ## Linux release package
 
 Download the Linux `.tar.gz` package from the GitHub release, then run the

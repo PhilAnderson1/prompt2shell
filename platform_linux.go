@@ -22,11 +22,19 @@ Return only the command itself in the field: no Markdown, explanation, prompt pr
 If the request is ambiguous, choose the safest non-destructive interpretation.`
 
 func configPaths() ([]string, error) {
+	portableConfig, err := executableConfigPath()
+	if err != nil {
+		return nil, err
+	}
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return nil, fmt.Errorf("find home directory: %w", err)
 	}
-	return []string{filepath.Join(home, ".config", "prompt2shell.conf"), "/etc/prompt2shell.conf"}, nil
+	return []string{
+		portableConfig,
+		filepath.Join(home, ".config", "prompt2shell.conf"),
+		"/etc/prompt2shell.conf",
+	}, nil
 }
 
 func enableSingleKeyInput(reader io.Reader) (func(), error) {
