@@ -9,7 +9,17 @@ if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administra
 }
 
 $sourceDirectory = $PSScriptRoot
-$binarySource = Join-Path $sourceDirectory "p2s.exe"
+$architecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString().ToUpperInvariant()
+switch ($architecture) {
+    "X64" { $binaryName = "p2s-windows-amd64.exe" }
+    "ARM64" { $binaryName = "p2s-windows-arm64.exe" }
+    default {
+        Write-Error "Unsupported Windows architecture: $architecture. Supported architectures are AMD64 and ARM64."
+        exit 1
+    }
+}
+
+$binarySource = Join-Path $sourceDirectory $binaryName
 $configSource = Join-Path $sourceDirectory "prompt2shell.conf"
 $installDirectory = Join-Path $env:ProgramFiles "prompt2shell"
 $binaryDestination = Join-Path $installDirectory "p2s.exe"
@@ -17,7 +27,7 @@ $configDirectory = Join-Path $env:ProgramData "prompt2shell"
 $configDestination = Join-Path $configDirectory "prompt2shell.conf"
 
 if (-not (Test-Path -LiteralPath $binarySource -PathType Leaf)) {
-    Write-Error "Missing $binarySource. Place the installer beside p2s.exe."
+    Write-Error "Missing $binarySource. Place both Windows binaries beside the installer."
     exit 1
 }
 
@@ -51,4 +61,5 @@ if (-not $alreadyPresent) {
 }
 
 Write-Host "Installed executable: $binaryDestination"
+Write-Host "Detected architecture: $architecture"
 Write-Host "Open a new PowerShell window, then run: p2s print the current directory"

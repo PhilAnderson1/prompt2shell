@@ -53,39 +53,16 @@ Do not commit a real access token to a public repository.
 
 ## Build and install
 
+Download the archive for your operating system from the GitHub Releases page.
+Each archive contains binaries for all supported architectures and an installer
+that selects the correct one automatically. See [INSTALL.md](INSTALL.md) for
+complete installation and build instructions.
+
+For a quick local Linux build and per-user installation:
+
 ```sh
 CGO_ENABLED=0 go build -o p2s .
 install -m 0755 p2s "$HOME/.local/bin/p2s"
-sudo install -m 0644 prompt2shell.conf /etc/prompt2shell.conf
-```
-
-The `0644` mode allows every local user to read the system-wide configuration,
-including its API token. For a single-user installation, prefer the per-user
-configuration with mode `0600`.
-
-Ensure `$HOME/.local/bin` is on your `PATH`. To build for another Linux machine:
-
-```sh
-CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o p2s-linux-amd64 .
-CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o p2s-linux-arm64 .
-```
-
-### Windows
-
-The Windows build asks the AI for PowerShell commands. It prefers PowerShell 7
-(`pwsh.exe`) and falls back to Windows PowerShell (`powershell.exe`). Build it on
-Linux with:
-
-```sh
-CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o p2s.exe .
-```
-
-Put `install-windows.ps1`, `prompt2shell.conf`, and
-`p2s.exe` together in a folder on the Windows machine. Open
-PowerShell as an administrator, change to that folder, and run:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\install-windows.ps1
 ```
 
 ## Use
