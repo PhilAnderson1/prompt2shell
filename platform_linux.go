@@ -56,6 +56,10 @@ func enableSingleKeyInput(reader io.Reader) (func(), error) {
 	}, nil
 }
 
+func readConfirmation(reader io.Reader) (bool, error) {
+	return readByteConfirmation(reader)
+}
+
 func executeCommand(command string, stdin io.Reader, stdout, stderr io.Writer) error {
 	shell := os.Getenv("SHELL")
 	if shell == "" {

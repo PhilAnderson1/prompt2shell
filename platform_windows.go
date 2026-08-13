@@ -38,14 +38,34 @@ func configPaths() ([]string, error) {
 }
 
 const (
-	enableEchoInput = 0x0004
-	enableLineInput = 0x0002
+	enableEchoInput            = 0x0004
+	enableLineInput            = 0x0002
+	enableVirtualTerminalInput = 0x0200
+	keyEvent                   = 0x0001
+	virtualKeyReturn           = 0x000D
+	virtualKeyEscape           = 0x001B
 )
 
+type inputRecord struct {
+	eventType uint16
+	_         uint16
+	event     [16]byte
+}
+
+type keyEventRecord struct {
+	keyDown         int32
+	repeatCount     uint16
+	virtualKeyCode  uint16
+	virtualScanCode uint16
+	unicodeChar     uint16
+	controlKeyState uint32
+}
+
 var (
-	kernel32       = syscall.NewLazyDLL("kernel32.dll")
-	getConsoleMode = kernel32.NewProc("GetConsoleMode")
-	setConsoleMode = kernel32.NewProc("SetConsoleMode")
+	kernel32         = syscall.NewLazyDLL("kernel32.dll")
+	getConsoleMode   = kernel32.NewProc("GetConsoleMode")
+	setConsoleMode   = kernel32.NewProc("SetConsoleMode")
+	readConsoleInput = kernel32.NewProc("ReadConsoleInputW")
 )
 
 func enableSingleKeyInput(reader io.Reader) (func(), error) {
@@ -62,12 +82,56 @@ func enableSingleKeyInput(reader io.Reader) (func(), error) {
 		}
 		return nil, fmt.Errorf("GetConsoleMode: %w", callErr)
 	}
-	modified := original &^ (enableEchoInput | enableLineInput)
+	// Virtual terminal input treats Esc as the start of an escape sequence,
+	// which can leave a lone Esc waiting for more input. Disable it while
+	// reading the confirmation key so Esc is delivered immediately.
+	modified := original &^ (enableEchoInput | enableLineInput | enableVirtualTerminalInput)
 	result, _, callErr = setConsoleMode.Call(uintptr(handle), uintptr(modified))
 	if result == 0 {
 		return nil, fmt.Errorf("SetConsoleMode: %w", callErr)
 	}
 	return func() { _, _, _ = setConsoleMode.Call(uintptr(handle), uintptr(original)) }, nil
+}
+
+func readConfirmation(reader io.Reader) (bool, error) {
+	file, ok := reader.(*os.File)
+	if !ok {
+		return readByteConfirmation(reader)
+	}
+	handle := syscall.Handle(file.Fd())
+	var mode uint32
+	result, _, _ := getConsoleMode.Call(uintptr(handle), uintptr(unsafe.Pointer(&mode)))
+	if result == 0 {
+		return readByteConfirmation(reader)
+	}
+	for {
+		var record inputRecord
+		var recordsRead uint32
+		result, _, callErr := readConsoleInput.Call(
+			uintptr(handle),
+			uintptr(unsafe.Pointer(&record)),
+			1,
+			uintptr(unsafe.Pointer(&recordsRead)),
+		)
+		if result == 0 {
+			return false, fmt.Errorf("ReadConsoleInputW: %w", callErr)
+		}
+		if recordsRead == 0 || record.eventType != keyEvent {
+			continue
+		}
+		key := (*keyEventRecord)(unsafe.Pointer(&record.event[0]))
+		if key.keyDown == 0 {
+			continue
+		}
+		switch key.virtualKeyCode {
+		case virtualKeyReturn:
+			return true, nil
+		case virtualKeyEscape:
+			return false, nil
+		default:
+			return false, nil
+		}
+	}
 }
 
 func executeCommand(command string, stdin io.Reader, stdout, stderr io.Writer) error {

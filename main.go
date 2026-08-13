@@ -148,6 +148,10 @@ func decodeCommand(content string) (commandResponse, error) {
 }
 
 func confirm(reader io.Reader) (bool, error) {
+	return readConfirmation(reader)
+}
+
+func readByteConfirmation(reader io.Reader) (bool, error) {
 	var key [1]byte
 	_, err := io.ReadFull(reader, key[:])
 	if err != nil {
