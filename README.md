@@ -56,7 +56,12 @@ Do not commit a real access token to a public repository.
 ```sh
 CGO_ENABLED=0 go build -o p2s .
 install -m 0755 p2s "$HOME/.local/bin/p2s"
+sudo install -m 0644 prompt2shell.conf /etc/prompt2shell.conf
 ```
+
+The `0644` mode allows every local user to read the system-wide configuration,
+including its API token. For a single-user installation, prefer the per-user
+configuration with mode `0600`.
 
 Ensure `$HOME/.local/bin` is on your `PATH`. To build for another Linux machine:
 
