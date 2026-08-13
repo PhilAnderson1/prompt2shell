@@ -1,7 +1,7 @@
 # Installing prompt2shell
 
-See the [tested API configurations](README.md#tested-api-configurations) before
-choosing an endpoint and `api_type`.
+See the [tested API configurations](https://github.com/PhilAnderson1/prompt2shell#tested-api-configurations)
+before choosing an endpoint and `api_type`.
 
 ## Linux release package
 
