@@ -1,11 +1,9 @@
 # prompt2shell
 
-prompt2shell turns a plain-English request into a Linux shell or Windows
-PowerShell command, displays it, and runs it only after you press Enter. Press
-Esc to abort.
-
-The program is written in Go so it builds as a single native executable with no
-runtime, package manager, or virtual environment required on the target machine.
+prompt2shell turns plain-English instructions into ready-to-run Linux shell or
+Windows PowerShell commands. It helps you use command-line tools without having
+to remember exact syntax, while always showing the generated command for
+approval before it runs. Press Enter to execute it or Esc to abort.
 
 ## Use
 
