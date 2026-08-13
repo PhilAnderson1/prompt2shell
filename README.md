@@ -9,14 +9,14 @@ command for approval before it runs. Press Enter to execute it or Esc to abort.
 
 - **Minimal:** a standalone compiled binary with no runtime dependencies to
   worry about.
+- **Flexible installation:** install it per user or system-wide, or run it
+  directly from a USB drive.
 - **Provider-independent:** works with OpenRouter, OpenAI, llama.cpp, and other
   compatible API endpoints.
 - **Terminal-independent:** works from your existing terminal—there is no
   replacement shell or terminal application to install.
 - **Cross-platform:** supports Linux and Windows, with binaries for x86-64 and
   Arm processors.
-- **Flexible installation:** install it per user or system-wide, or run it
-  directly from a USB drive.
 
 ## Use
 
