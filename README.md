@@ -5,6 +5,17 @@ shell or Windows PowerShell commands. It helps you use command-line tools
 without having to remember exact syntax, while always showing the generated
 command for approval before it runs. Press Enter to execute it or Esc to abort.
 
+## Why prompt2shell?
+
+- **Minimal:** a standalone compiled binary with no runtime dependencies to
+  worry about.
+- **Provider-independent:** works with OpenRouter, OpenAI, llama.cpp, and other
+  compatible API endpoints.
+- **Terminal-independent:** works from your existing terminal—there is no
+  replacement shell or terminal application to install.
+- **Cross-platform:** supports Linux and Windows, with binaries for x86-64 and
+  Arm processors.
+
 ## Use
 
 ```text
