@@ -14,10 +14,12 @@ The installer detects AMD64, ARM64, or ARMv7 and installs the corresponding
 binary as `/usr/local/bin/p2s`. It installs the supplied configuration as
 `/etc/prompt2shell.conf` only if that file does not already exist.
 
-Edit the configuration and replace its placeholder endpoint details before
-running `p2s`. A system-wide configuration installed with mode `0644` can be
-read by every local user. For a private per-user configuration, instead place
-the file at `~/.config/prompt2shell.conf` and set its mode to `0600`.
+Before running `p2s`, edit `/etc/prompt2shell.conf` and replace
+`[your api token goes here]` with your OpenRouter API key. Alternatively, change
+the endpoint, model, and API type to use another supported AI endpoint. A
+system-wide configuration installed with mode `0644` can be read by every local
+user. For a private per-user configuration, instead place the file at
+`~/.config/prompt2shell.conf` and set its mode to `0600`.
 
 To install a particular Linux binary manually:
 
@@ -43,8 +45,14 @@ The installer detects AMD64 or ARM64, installs the corresponding binary as
 installs the supplied configuration under `ProgramData` only if no system-wide
 configuration already exists.
 
-Open a new PowerShell window after installation. Edit the configuration and
-replace its placeholder endpoint details before running `p2s`.
+Open a new PowerShell window after installation. Before running `p2s`, edit:
+
+```text
+C:\ProgramData\prompt2shell\prompt2shell.conf
+```
+
+Replace `[your api token goes here]` with your OpenRouter API key. Alternatively,
+change the endpoint, model, and API type to use another supported AI endpoint.
 
 ## Build from source
 

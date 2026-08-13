@@ -51,6 +51,14 @@ chmod 600 ~/.config/prompt2shell.conf
 
 Do not commit a real access token to a public repository.
 
+After installation, edit `prompt2shell.conf` and add your API key. You can also
+replace the supplied OpenRouter endpoint and model with another supported AI
+endpoint. The system-wide configuration is installed at:
+
+- Linux: `/etc/prompt2shell.conf`
+- Windows: `%ProgramData%\prompt2shell\prompt2shell.conf` (normally
+  `C:\ProgramData\prompt2shell\prompt2shell.conf`)
+
 ## Build and install
 
 Download the archive for your operating system from the GitHub Releases page.
