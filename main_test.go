@@ -5,6 +5,32 @@ import (
 	"testing"
 )
 
+func TestDecodeCommand(t *testing.T) {
+	got, err := decodeCommand(`{"command":"Get-ChildItem"}`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got.Command != "Get-ChildItem" {
+		t.Fatalf("got %q, want Get-ChildItem", got.Command)
+	}
+}
+
+func TestDecodeCommandRejectsMalformedShapes(t *testing.T) {
+	invalid := []string{
+		`"Get-Date"`,
+		`"command": "Get-ChildItem"`,
+		"```json\n{\"command\":\"Get-ChildItem\"}\n```",
+		`<think>  </think>  "command": "Get-Date"`,
+		`{"command":"Get-Date","explanation":"extra"}`,
+		`{"command":"Get-Date"} trailing text`,
+	}
+	for _, content := range invalid {
+		if _, err := decodeCommand(content); err == nil {
+			t.Errorf("expected %q to be rejected", content)
+		}
+	}
+}
+
 func TestBuildChatRequestUsesProviderControl(t *testing.T) {
 	tests := []struct {
 		apiType       string

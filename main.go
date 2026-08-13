@@ -10,24 +10,15 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-	"syscall"
 	"time"
-	"unsafe"
 )
-
-const systemPrompt = `Convert the user's natural-language request into one Linux shell command.
-Return JSON with exactly one string field named "command".
-The command must work from the user's current directory unless they ask otherwise.
-Prefer standard Linux utilities, preserve paths and constraints precisely, and do not add sudo unless explicitly requested.
-Return only the command itself in the field: no Markdown, explanation, prompt prefix, or newline.
-If the request is ambiguous, choose the safest non-destructive interpretation.`
 
 type chatRequest struct {
 	Model              string            `json:"model"`
 	Messages           []message         `json:"messages"`
 	Temperature        float64           `json:"temperature"`
 	MaxTokens          int               `json:"max_tokens"`
-	ResponseFormat     map[string]string `json:"response_format"`
+	ResponseFormat     map[string]any    `json:"response_format"`
 	ChatTemplateKwargs map[string]bool   `json:"chat_template_kwargs,omitempty"`
 	Reasoning          map[string]string `json:"reasoning,omitempty"`
 }
@@ -51,12 +42,26 @@ func buildChatRequest(config Config, instruction string) chatRequest {
 	payload := chatRequest{
 		Model: config.Model,
 		Messages: []message{
-			{Role: "system", Content: systemPrompt},
+			{Role: "system", Content: platformSystemPrompt},
 			{Role: "user", Content: instruction},
 		},
-		Temperature:    0.1,
-		MaxTokens:      300,
-		ResponseFormat: map[string]string{"type": "json_object"},
+		Temperature: 0.1,
+		MaxTokens:   300,
+		ResponseFormat: map[string]any{
+			"type": "json_object",
+			"schema": map[string]any{
+				"type": "object",
+				"properties": map[string]any{
+					"command": map[string]any{
+						"type":      "string",
+						"minLength": 1,
+						"pattern":   `^[^\r\n\x00]+$`,
+					},
+				},
+				"required":             []string{"command"},
+				"additionalProperties": false,
+			},
+		},
 	}
 	switch config.APIType {
 	case "openrouter":
@@ -68,6 +73,9 @@ func buildChatRequest(config Config, instruction string) chatRequest {
 }
 
 func generateCommand(config Config, instruction string) (string, error) {
+	if config.APIType == "openai" {
+		return generateOpenAICommand(config, instruction)
+	}
 	payload := buildChatRequest(config, instruction)
 	body, err := json.Marshal(payload)
 	if err != nil {
@@ -106,9 +114,9 @@ func generateCommand(config Config, instruction string) (string, error) {
 		return "", errors.New("AI endpoint returned no choices")
 	}
 
-	var generated commandResponse
-	if err := json.Unmarshal([]byte(completion.Choices[0].Message.Content), &generated); err != nil {
-		return "", fmt.Errorf("decode generated command: %w", err)
+	generated, err := decodeCommand(completion.Choices[0].Message.Content)
+	if err != nil {
+		return "", err
 	}
 	command := strings.TrimSpace(generated.Command)
 	if command == "" {
@@ -120,31 +128,23 @@ func generateCommand(config Config, instruction string) (string, error) {
 	return command, nil
 }
 
-func enableSingleKeyInput(reader io.Reader) (func(), error) {
-	file, ok := reader.(*os.File)
-	if !ok {
-		return func() {}, nil
+func decodeCommand(content string) (commandResponse, error) {
+	var generated commandResponse
+	decoder := json.NewDecoder(strings.NewReader(strings.TrimSpace(content)))
+	decoder.DisallowUnknownFields()
+	if err := decoder.Decode(&generated); err != nil {
+		return commandResponse{}, fmt.Errorf("decode generated command: %w", err)
 	}
-	fd := file.Fd()
-	var original syscall.Termios
-	_, _, errno := syscall.Syscall6(syscall.SYS_IOCTL, fd, syscall.TCGETS, uintptr(unsafe.Pointer(&original)), 0, 0, 0)
-	if errno != 0 {
-		if errno == syscall.ENOTTY {
-			return func() {}, nil
+	if err := decoder.Decode(&struct{}{}); !errors.Is(err, io.EOF) {
+		if err == nil {
+			err = errors.New("multiple JSON values")
 		}
-		return nil, errno
+		return commandResponse{}, fmt.Errorf("decode generated command: %w", err)
 	}
-	modified := original
-	modified.Lflag &^= syscall.ICANON | syscall.ECHO
-	modified.Cc[syscall.VMIN] = 1
-	modified.Cc[syscall.VTIME] = 0
-	_, _, errno = syscall.Syscall6(syscall.SYS_IOCTL, fd, syscall.TCSETS, uintptr(unsafe.Pointer(&modified)), 0, 0, 0)
-	if errno != 0 {
-		return nil, errno
+	if strings.TrimSpace(generated.Command) == "" {
+		return commandResponse{}, errors.New("AI returned an empty command")
 	}
-	return func() {
-		syscall.Syscall6(syscall.SYS_IOCTL, fd, syscall.TCSETS, uintptr(unsafe.Pointer(&original)), 0, 0, 0)
-	}, nil
+	return generated, nil
 }
 
 func confirm(reader io.Reader) (bool, error) {
@@ -161,7 +161,7 @@ func confirm(reader io.Reader) (bool, error) {
 
 func run(args []string, stdin io.Reader, stdout, stderr io.Writer) error {
 	if len(args) == 0 {
-		return errors.New("usage: s <describe the command you want>")
+		return fmt.Errorf("usage: %s <describe the command you want>", executableName)
 	}
 
 	config, err := loadConfig()
@@ -189,15 +189,7 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer) error {
 		return errors.New("aborted")
 	}
 
-	shell := os.Getenv("SHELL")
-	if shell == "" {
-		shell = "/bin/sh"
-	}
-	child := exec.Command(shell, "-c", command)
-	child.Stdin = stdin
-	child.Stdout = stdout
-	child.Stderr = stderr
-	return child.Run()
+	return executeCommand(command, stdin, stdout, stderr)
 }
 
 func main() {
@@ -206,7 +198,7 @@ func main() {
 		if errors.As(err, &exitError) {
 			os.Exit(exitError.ExitCode())
 		}
-		fmt.Fprintln(os.Stderr, "s:", err)
+		fmt.Fprintln(os.Stderr, executableName+":", err)
 		os.Exit(1)
 	}
 }

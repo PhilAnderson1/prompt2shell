@@ -7,26 +7,23 @@ import (
 	"io"
 	"net/url"
 	"os"
-	"path/filepath"
 	"strings"
 )
 
 type Config struct {
-	Endpoint string
-	Model    string
-	APIToken string
-	APIType  string
+	Endpoint        string
+	Model           string
+	APIToken        string
+	APIType         string
+	ReasoningEffort string
 }
 
 func loadConfig() (Config, error) {
-	home, err := os.UserHomeDir()
+	paths, err := configPaths()
 	if err != nil {
-		return Config{}, fmt.Errorf("find home directory: %w", err)
+		return Config{}, err
 	}
-	return loadConfigFrom([]string{
-		filepath.Join(home, ".config", "prompt2shell.conf"),
-		"/etc/prompt2shell.conf",
-	})
+	return loadConfigFrom(paths)
 }
 
 func loadConfigFrom(paths []string) (Config, error) {
@@ -48,7 +45,7 @@ func loadConfigFrom(paths []string) (Config, error) {
 		}
 		return config, nil
 	}
-	return Config{}, fmt.Errorf("configuration not found; create %s or /etc/prompt2shell.conf", paths[0])
+	return Config{}, fmt.Errorf("configuration not found; create %s or %s", paths[0], paths[1])
 }
 
 func parseConfig(reader io.Reader) (Config, error) {
@@ -78,6 +75,8 @@ func parseConfig(reader io.Reader) (Config, error) {
 			config.APIToken = value
 		case "api_type":
 			config.APIType = value
+		case "reasoning_effort":
+			config.ReasoningEffort = value
 		default:
 			return Config{}, fmt.Errorf("line %d: unknown key %q", lineNumber, key)
 		}
@@ -89,10 +88,17 @@ func parseConfig(reader io.Reader) (Config, error) {
 		return Config{}, errors.New("endpoint and model are required")
 	}
 	validAPITypes := map[string]bool{
-		"generic": true, "openrouter": true, "llamacpp": true,
+		"generic": true, "openrouter": true, "llamacpp": true, "openai": true,
 	}
 	if !validAPITypes[config.APIType] {
-		return Config{}, errors.New("api_type must be one of: generic, openrouter, llamacpp")
+		return Config{}, errors.New("api_type must be one of: generic, openrouter, llamacpp, openai")
+	}
+	validReasoningEfforts := map[string]bool{
+		"": true, "none": true, "minimal": true, "low": true,
+		"medium": true, "high": true, "xhigh": true, "max": true,
+	}
+	if !validReasoningEfforts[config.ReasoningEffort] {
+		return Config{}, errors.New("reasoning_effort must be one of: none, minimal, low, medium, high, xhigh, max")
 	}
 	parsedURL, err := url.Parse(config.Endpoint)
 	if err != nil || parsedURL.Host == "" || (parsedURL.Scheme != "https" && parsedURL.Scheme != "http") {

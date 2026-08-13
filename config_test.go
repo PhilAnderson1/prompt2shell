@@ -8,11 +8,11 @@ import (
 )
 
 func TestParseConfig(t *testing.T) {
-	config, err := parseConfig(strings.NewReader("# comment\nendpoint=https://example.com/v1/chat/completions\nmodel=test-model\napi_token=secret\napi_type=openrouter\n"))
+	config, err := parseConfig(strings.NewReader("# comment\nendpoint=https://example.com/v1/chat/completions\nmodel=test-model\napi_token=secret\napi_type=openrouter\nreasoning_effort=low\n"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	if config.Endpoint != "https://example.com/v1/chat/completions" || config.Model != "test-model" || config.APIToken != "secret" || config.APIType != "openrouter" {
+	if config.Endpoint != "https://example.com/v1/chat/completions" || config.Model != "test-model" || config.APIToken != "secret" || config.APIType != "openrouter" || config.ReasoningEffort != "low" {
 		t.Fatalf("unexpected config: %#v", config)
 	}
 }
@@ -24,6 +24,7 @@ func TestParseConfigRejectsInvalidInput(t *testing.T) {
 		"endpoint=https://example.com\nmodel=test\nunknown=value\n",
 		"endpoint=https://one.example\nendpoint=https://two.example\nmodel=test\n",
 		"endpoint=https://example.com\nmodel=test\napi_type=unknown\n",
+		"endpoint=https://example.com\nmodel=test\nreasoning_effort=extreme\n",
 	}
 	for _, input := range tests {
 		if _, err := parseConfig(strings.NewReader(input)); err == nil {

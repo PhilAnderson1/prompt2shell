@@ -1,16 +1,21 @@
 # prompt2shell
 
-`s` turns a plain-English request into a Linux shell command, displays it, and
-runs it only after you press Enter. Press Esc to abort.
+prompt2shell turns a plain-English request into a Linux shell or Windows
+PowerShell command, displays it, and runs it only after you press Enter. Press
+Esc to abort.
 
 The program is written in Go so it builds as a single native executable with no
 runtime, package manager, or virtual environment required on the target machine.
 
 ## Configure the AI endpoint
 
-Create `~/.config/prompt2shell.conf` for a per-user configuration, or
-`/etc/prompt2shell.conf` for a system-wide configuration. The per-user file takes
-precedence when both exist.
+Configuration paths, in lookup order:
+
+- Linux: `~/.config/prompt2shell.conf`, then `/etc/prompt2shell.conf`
+- Windows: `%APPDATA%\prompt2shell\prompt2shell.conf`, then
+  `%ProgramData%\prompt2shell\prompt2shell.conf`
+
+The per-user file takes precedence when both exist.
 
 ```ini
 # OpenRouter example
@@ -22,9 +27,23 @@ api_type=openrouter
 
 `endpoint` and `model` are required. `api_token` may be left empty when the
 endpoint does not require authentication. Set `api_type` to `openrouter`,
-`llamacpp`, or `generic`; it defaults to `generic`. This lets `s` disable model
-reasoning using only the parameter supported by that API. The endpoint must be reachable
-from every machine where `s` will run. Protect a per-user file with:
+`llamacpp`, `openai`, or `generic`; it defaults to `generic`. This lets `p2s` disable model
+reasoning using only the parameter supported by that API. For native OpenAI, use
+`api_type=openai` with a Responses API endpoint such as
+`https://api.openai.com/v1/responses`.
+
+For native OpenAI endpoints, `reasoning_effort` may optionally be set to a value supported by the selected model. For example:
+
+```ini
+endpoint=https://api.openai.com/v1/responses
+model=gpt-5-nano
+api_token=YOUR_OPENAI_API_KEY
+api_type=openai
+reasoning_effort=minimal
+```
+
+Allowed configuration values are `none`, `minimal`, `low`, `medium`, `high`, `xhigh`, and `max`, but each model supports only a subset. When omitted, the API uses the model default. The endpoint must be
+reachable from every machine where `p2s` will run. Protect a per-user file with:
 
 ```sh
 chmod 600 ~/.config/prompt2shell.conf
@@ -35,24 +54,45 @@ Do not commit a real access token to a public repository.
 ## Build and install
 
 ```sh
-CGO_ENABLED=0 go build -o s .
-install -m 0755 s "$HOME/.local/bin/s"
+CGO_ENABLED=0 go build -o p2s .
+install -m 0755 p2s "$HOME/.local/bin/p2s"
 ```
 
 Ensure `$HOME/.local/bin` is on your `PATH`. To build for another Linux machine:
 
 ```sh
-CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o s-linux-amd64 .
-CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o s-linux-arm64 .
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o p2s-linux-amd64 .
+CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o p2s-linux-arm64 .
+```
+
+### Windows
+
+The Windows build asks the AI for PowerShell commands. It prefers PowerShell 7
+(`pwsh.exe`) and falls back to Windows PowerShell (`powershell.exe`). Build it on
+Linux with:
+
+```sh
+CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o p2s.exe .
+```
+
+Place `p2s.exe` in a directory on your Windows `PATH`. Create the user
+configuration directory and copy the example from PowerShell:
+
+```powershell
+New-Item -ItemType Directory -Force "$env:APPDATA\prompt2shell"
+Copy-Item .\prompt2shell.conf "$env:APPDATA\prompt2shell\prompt2shell.conf"
 ```
 
 ## Use
 
 ```text
-$ s find files bigger than 100mb in the current directory
+$ p2s find files bigger than 100mb in the current directory
 find . -type f -size +100M
 Press Enter to run, or Esc to abort:
 ```
+
+On Windows, use `p2s` in PowerShell; generated commands
+use PowerShell syntax.
 
 Always inspect generated commands before running them, especially commands that
 modify or delete files.
