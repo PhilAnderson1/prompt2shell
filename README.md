@@ -3,7 +3,7 @@
 prompt2shell uses AI to turn plain-English instructions into ready-to-run Linux
 shell or Windows PowerShell commands. It helps you use command-line tools
 without having to remember exact syntax, while always showing the generated
-command for approval before it runs. Press Enter to execute it or Esc to abort.
+command for approval before it runs.
 
 ## Why prompt2shell?
 
