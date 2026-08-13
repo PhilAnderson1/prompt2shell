@@ -33,7 +33,8 @@ modify or delete files.
 
 ## Build and install
 
-Download the archive for your operating system from the GitHub Releases page.
+Download the archive for your operating system from the
+[GitHub Releases page](https://github.com/PhilAnderson1/prompt2shell/releases).
 Each archive contains binaries for all supported architectures and an installer
 that selects the correct one automatically. See [INSTALL.md](INSTALL.md) for
 complete installation and build instructions.
