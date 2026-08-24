@@ -121,3 +121,7 @@ api_type=llamacpp
 endpoint=https://api.openai.com/v1/responses
 api_type=openai
 ```
+
+## License
+
+[MIT License](https://opensource.org/license/mit)
