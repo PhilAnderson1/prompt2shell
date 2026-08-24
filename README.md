@@ -124,4 +124,4 @@ api_type=openai
 
 ## License
 
-[MIT License](https://opensource.org/license/mit)
+prompt2shell is available under the [MIT License](https://opensource.org/license/mit).
